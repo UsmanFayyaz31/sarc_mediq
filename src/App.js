@@ -1,25 +1,50 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Fragment } from "react";
+import { Switch } from "react-router";
+import "./App.css";
+import Layout from "./components/Layout";
+import {
+  authenticatedRoutes,
+  authenticationRoutes,
+} from "./components/routes/allRoutes";
+import Authmiddleware from "./components/routes/middleware/AuthMiddleware";
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Fragment>
+      <Switch>
+        {authenticationRoutes.map((route, idx) => (
+          <Authmiddleware
+            path={route.path}
+            layout={Layout}
+            component={route.component}
+            key={idx}
+            isAuthProtected={false}
+          />
+        ))}
+
+        {authenticatedRoutes.map((route, idx) => (
+          <Authmiddleware
+            path={route.path}
+            layout={Layout}
+            component={route.component}
+            key={idx}
+            isAuthProtected={true}
+          />
+        ))}
+
+        {/*
+        {unAuthenticatedRoutes.map((route, idx) => (
+          <Authmiddleware
+            path={route.path}
+            layout={Layout}
+            component={route.component}
+            key={idx}
+            isAuthProtected={false}
+          />
+        ))} */}
+      </Switch>
+    </Fragment>
   );
-}
+};
 
 export default App;
