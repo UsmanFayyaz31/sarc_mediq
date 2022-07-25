@@ -9,6 +9,6 @@ export const HOME = "/";
 //un-authenticated routes
 // export const HOME = "/";
 
-export const USER = BASE_URL + "api/v1/user/";
-export const SIGN_IN_API = BASE_URL + "api/v1/user/login/"
-export const SIGN_UP_API = BASE_URL + "api/v1/user/register/"
+export const VISIT_API = BASE_URL + "api/v1/visit/";
+export const SIGN_IN_API = BASE_URL + "api/v1/user/login/";
+export const SIGN_UP_API = BASE_URL + "api/v1/user/register/";
