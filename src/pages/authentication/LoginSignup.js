@@ -1,16 +1,21 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { Row, FormGroup, Label, Button, Form, Container } from "reactstrap";
+import { useHistory } from "react-router-dom";
+
 import {
-  Row,
-  FormGroup,
-  Label,
-  Input,
-  Button,
-  Form,
-  Container,
-} from "reactstrap";
+  HOME,
+  SIGN_IN_API,
+  SIGN_UP_API,
+} from "../../components/services/constants";
+import { postRequestWithoutHeader } from "../../components/services/server";
+import { sessionExpireChecker } from "../../helpers";
 
 const LoginSignup = () => {
+  const history = useHistory();
+  const [loginApiError, setLoginApiError] = useState(null);
+  const [signupApiError, setSignupApiError] = useState(null);
+
   const {
     register: logInRegister,
     handleSubmit: handleLogInSubmit,
@@ -30,11 +35,48 @@ const LoginSignup = () => {
   const [isSignUpForm, setIsSignUpForm] = useState(false);
 
   const onLoginSubmit = (data) => {
-    console.log("debugging login Form", data);
+    setLoginApiError(null);
+
+    postRequestWithoutHeader(SIGN_IN_API, data)
+      .then((result) => {
+        if (result.status === 200) {
+          localStorage.setItem("t", result.data.token.access);
+          localStorage.setItem("authUser", result.data.user);
+          history.push(HOME);
+        }
+      })
+      .catch((error) => {
+        sessionExpireChecker(error.status, history);
+        if (error.status === 404) {
+          if (error?.data?.errors?.non_field_errors.length > 0)
+            setLoginApiError(error.data.errors.non_field_errors[0]);
+        }
+      });
   };
 
   const onSignUpSubmit = (data) => {
-    console.log("debugging sign up Form", data);
+    setSignupApiError(null);
+
+    postRequestWithoutHeader(SIGN_UP_API, data)
+      .then((result) => {
+        if (result.status === 201) {
+          localStorage.setItem("t", result.data.token.access);
+          localStorage.setItem("authUser", result.data.user);
+          history.push(HOME);
+        }
+      })
+      .catch((error) => {
+        sessionExpireChecker(error.status, history);
+        if (error.status === 400) {
+          if (error?.data?.errors?.email) {
+            if (error?.data?.errors?.email.length > 0)
+              setSignupApiError(error.data.errors.email[0]);
+          } else if (error?.data?.errors?.non_field_errors) {
+            if (error?.data?.errors?.non_field_errors.length > 0)
+              setSignupApiError(error.data.errors.non_field_errors[0]);
+          }
+        }
+      });
   };
 
   return (
@@ -86,6 +128,7 @@ const LoginSignup = () => {
               )}
             </FormGroup>
             <div style={{ textAlign: "center" }}>
+              <p className="form-error mt-2">{loginApiError}</p>
               <Button htmlFor="login-form">Log In</Button>
               <p
                 className="create-account-text"
@@ -172,25 +215,6 @@ const LoginSignup = () => {
               </FormGroup>
 
               <FormGroup>
-                <Label for="passwordField">USER NAME:</Label>
-                <input
-                  className="form-control"
-                  type="text"
-                  name="user_name"
-                  placeholder="Enter your user name"
-                  {...signUpRegister("username", {
-                    required: {
-                      value: true,
-                      message: "You need to enter user name.",
-                    },
-                  })}
-                />
-                {signupErrors.username && (
-                  <p className="form-error">{signupErrors.username.message}</p>
-                )}
-              </FormGroup>
-
-              <FormGroup>
                 <Label for="passwordField">PASSWORD:</Label>
                 <input
                   className="form-control"
@@ -230,7 +254,7 @@ const LoginSignup = () => {
                 )}
               </FormGroup>
 
-              <FormGroup>
+              {/* <FormGroup>
                 <Label>GENDER:</Label>
                 <select
                   className="form-select"
@@ -251,9 +275,10 @@ const LoginSignup = () => {
                 {signupErrors.gender && (
                   <p className="form-error">{signupErrors.gender.message}</p>
                 )}
-              </FormGroup>
+              </FormGroup> */}
 
               <div style={{ textAlign: "center" }}>
+                <p className="form-error mt-2">{signupApiError}</p>
                 <Button htmlFor="signup-form">Sign Up</Button>
               </div>
             </Form>
