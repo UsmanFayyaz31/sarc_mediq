@@ -1,5 +1,5 @@
 import LoginSignup from "../../pages/authentication/LoginSignup";
-import Home from "../../pages/unAuthenticated/Home";
+import Home from "../../pages/authenticated/Home";
 import { HOME, SIGN_IN } from "../services/constants";
 
 const authenticationRoutes = [

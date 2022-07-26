@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { Card, CardBody, Table, Alert } from "reactstrap";
+import { Card, CardBody, Table, Alert, Button } from "reactstrap";
 import {
   VISIT_API,
   VISIT_FILE_UPLOAD_API,
@@ -11,6 +11,7 @@ import {
   postRequest,
 } from "../../components/services/server";
 import { sessionExpireChecker } from "../../helpers";
+import LoginSignup from "../authentication/LoginSignup";
 
 const Home = () => {
   const history = useHistory();
@@ -65,8 +66,18 @@ const Home = () => {
     }
   };
 
+  const logOut = () => {
+    localStorage.removeItem("authUser");
+    localStorage.removeItem("t");
+    history.push(LoginSignup);
+  };
+
   return (
     <div>
+      <br />
+      <div style={{ width: "98%", margin: "auto", textAlign: "end" }}>
+        <Button onClick={logOut}>Log Out</Button>
+      </div>
       <br />
       <Card style={{ width: "98%", margin: "auto" }}>
         <CardBody>
